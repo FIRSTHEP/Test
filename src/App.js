@@ -18,7 +18,6 @@ import {
   DatePicker,
   Divider,
   Table,
-  Spin
 } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
@@ -41,19 +40,19 @@ const App = () => {
 
   useEffect(() => {
     const localData = localStorage.getItem('local-data')
-    console.log('localStorage:', JSON.parse(localData))
+    console.log('Local-Storage-Data:', JSON.parse(localData))
     if (localData !== null) {
       setData(JSON.parse(localData))
     }
   }, [])
 
   const onFinish = (values) => {
-    localStorage.clear();
     let list = [...data, values]
     const newData = list.map((x, i) => {
       x.id = i + 1
       return x
     })
+    localStorage.clear();
     setData(newData)
     localStorage.setItem('local-data', JSON.stringify(newData))
     window.location.reload()
@@ -73,7 +72,7 @@ const App = () => {
       title: 'Name',
       dataIndex: 'firstName',
       render: (text, record) => (
-        <span>{record.firstName}{' '}{record.lastName}</span>
+        <span>{record.title}{' '}{record.firstName}{' '}{record.lastName}</span>
       ),
     },
     {
@@ -109,7 +108,9 @@ const App = () => {
           <Button
             icon={(<EditOutlined />)}
             style={{ width: '48px', height: '48px', marginRight: '0.5em' }}
-            onClick={() => { showEditModal(record.id) }} />
+            onClick={() => {
+              showEditModal(record.id, record.title, record.firstName, record.lastName, record.nationality, record.gender, record.mobilePhone, record.prefix)
+            }} />
           <Button
             icon={(<DeleteOutlined />)}
             style={{ width: '48px', height: '48px', marginLeft: '0.5em' }}
@@ -141,10 +142,9 @@ const App = () => {
   }
 
   const editTask = () => {
-    localStorage.clear();
-    const newData = data.map(i =>
-      i.id === taskId ? {
-        ...i,
+    const newData = data.map(item =>
+      item.id === taskId ? {
+        ...item,
         title: title,
         firstName: firstName,
         lastName: lastName,
@@ -152,8 +152,9 @@ const App = () => {
         prefix: prefix,
         mobilePhone: mobilePhone,
         nationality: nationality
-      } : i
+      } : item
     );
+    localStorage.clear();
     setData(newData)
     localStorage.setItem('local-data', JSON.stringify(newData))
     cancelEditModal()
@@ -183,330 +184,330 @@ const App = () => {
   }
 
   const removeRowSelected = () => {
-    // console.log('rowID :',selectedRowKeys)
-    var result = [];
-    var obj = {};
     for (var i = 0; i < selectRows.length; i++) {
-      if (!obj[selectRows[i].key]) {
-        result.push(selectRows[i]);
-        obj[selectRows[i].key] = true;
-      }
+      data.splice(data.findIndex((item) => item.id == selectRows[i].id), 1)
     }
-    console.log(result);
+    localStorage.clear();
+    setData(data)
+    localStorage.setItem('local-data', JSON.stringify(data))
+    window.location.reload()
   }
 
-    const removeTask = (taskId) => {
-      localStorage.clear();
-      const newData = data.filter((i) => {
-        return i.id !== taskId
-      })
-      setData(newData)
-      localStorage.setItem('local-data', JSON.stringify(newData))
-      window.location.reload()
-    }
+  const removeTask = (taskId) => {
+    const newData = data.filter((i) => {
+      return i.id !== taskId
+    })
+    localStorage.clear();
+    setData(newData)
+    localStorage.setItem('local-data', JSON.stringify(newData))
+    window.location.reload()
+  }
 
-    const rowSelection = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        setSelectRow(selectedRows)
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-      },
-    };
+  const rowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      setSelectRow(selectedRows)
+      // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+    },
+  };
 
-    const showEditModal = (taskId) => {
-      setTaskId(taskId)
-      setVisible(true);
-    };
+  const showEditModal = (taskId, title, firstName, lastName, nationality, gender, mobilePhone, prefix) => {
+    setTaskId(taskId)
+    setTitle(title)
+    setFirstName(firstName)
+    setLastName(lastName)
+    setNationality(nationality)
+    setGender(gender)
+    setMobilePhone(mobilePhone)
+    setPrefix(prefix)
+    setVisible(true);
+  };
 
-    const cancelEditModal = () => {
-      setVisible(false);
-    };
+  const cancelEditModal = () => {
+    setVisible(false);
+  };
 
-    const hasSelected = selectRows.length > 0;
-    const hasData = data !== null && data.length > 0;
-    return (
-      <>
-        <Modal
-          title={`Edit Task ID : ${taskId}`}
-          visible={visible}
-          onOk={() => { confirmEdit() }}
-          onCancel={cancelEditModal}>
-          <Row gutter={[16, 16]}>
-            <Col span={24} >
-              Title:
+  const hasSelected = selectRows.length > 0;
+  const hasData = data !== null && data.length > 0;
+  return (
+    <>
+      <Modal
+        title={`Edit Task ID : ${taskId}`}
+        visible={visible}
+        onOk={() => { confirmEdit() }}
+        onCancel={cancelEditModal}>
+        <Row gutter={[16, 16]}>
+          <Col span={24}>
+            Title:
               <Select
-                style={{ width: '100%' }}
-                onSelect={(e) => { setTitle(e) }}
-                placeholder="-- Please Select --">
-                <Option value='Mr.'>Mr.</Option>
-                <Option value='Mrs.'>Mrs.</Option>
-                <Option value='Miss'>Miss</Option>
-                <Option value='Ms.'>Ms.</Option>
-              </Select>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={12} >
-              First Name:
+              defaultValue={title}
+              style={{ width: '100%' }}
+              onSelect={(e) => { setTitle(e) }}>
+              <Option value='Mr.'>Mr.</Option>
+              <Option value='Mrs.'>Mrs.</Option>
+              <Option value='Miss'>Miss</Option>
+              <Option value='Ms.'>Ms.</Option>
+            </Select>
+          </Col>
+        </Row>
+        <Row gutter={[16, 16]}>
+          <Col span={12}>
+            First Name:
               <Input
-                onChange={(e) => { setFirstName(e.target.value) }}
-                type="text"
-                block="true"
-                allowClear
-              />
-            </Col>
-            <Col span={12} >
-              Last Name:
+              defaultValue={firstName}
+              onChange={(e) => { setFirstName(e.target.value) }}
+              type="text"
+              block="true"
+              allowClear
+            />
+          </Col>
+          <Col span={12}>
+            Last Name:
               <Input
-                onChange={(e) => { setLastName(e.target.value) }}
-                type="text"
-                block="true"
-                allowClear
-              />
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={24} >
-              Nationality:
+              defaultValue={lastName}
+              onChange={(e) => { setLastName(e.target.value) }}
+              type="text"
+              block="true"
+              allowClear
+            />
+          </Col>
+        </Row>
+        <Row gutter={[16, 16]}>
+          <Col span={24}>
+            Nationality:
               <Select
-                onSelect={(e) => { setNationality(e) }}
-                placeholder="-- Please Select --" style={{ width: '100%' }}>
-                <Option value='THAI'>THAI</Option>
-                <Option value='AMERICAN'>AMERICAN</Option>
-                <Option value='LAOS'>LAOS</Option>
-              </Select>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={24} >
-              Gender:
+              defaultValue={nationality}
+              onSelect={(e) => { setNationality(e) }}
+              style={{ width: '100%' }}>
+              <Option value='THAI'>THAI</Option>
+              <Option value='AMERICAN'>AMERICAN</Option>
+              <Option value='LAOS'>LAOS</Option>
+            </Select>
+          </Col>
+        </Row>
+        <Row gutter={[16, 16]}>
+          <Col span={24}>
+            Gender:
               <Radio.Group
-                onChange={(e) => { setGender(e.target.value) }}
-                style={{ paddingLeft: '1rem' }}>
-                <Radio value="Male">Male</Radio>
-                <Radio value="Female">Female</Radio>
-                <Radio value="Unisex">Unisex</Radio>
-              </Radio.Group>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={14} >
-              Mobile Phone:
+              defaultValue={gender}
+              onChange={(e) => { setGender(e.target.value) }}
+              style={{ paddingLeft: '1rem' }}>
+              <Radio value="Male">Male</Radio>
+              <Radio value="Female">Female</Radio>
+              <Radio value="Unisex">Unisex</Radio>
+            </Radio.Group>
+          </Col>
+        </Row>
+        <Row gutter={[16, 16]}>
+          <Col span={14}>
+            Mobile Phone:
               <Input
-                onChange={(e) => { setMobilePhone(e.target.value) }}
-                type="number"
-                allowClear />
-            </Col>
-            <Col span={10} >
-              Country Code:
+              defaultValue={mobilePhone}
+              onChange={(e) => { setMobilePhone(e.target.value) }}
+              type="number"
+              allowClear />
+          </Col>
+          <Col span={10}>
+            Country Code:
               <Select
-                onChange={(e) => { setPrefix(e) }}
-                placeholder="-- Please Select --"
-                style={{ width: '100%' }}>
-                <Option value="+66"><div><img src={ThaiIcon} alt="thai_icon" width="14" height="auto" />{' '}<span>+66</span></div></Option>
-                <Option value="+1"><div><img src={UsIcon} alt="us_icon" width="14" height="auto" />{' '}<span>+1</span></div></Option>
-                <Option value="+856"><div><img src={LaosIcon} alt="laos_icon" width="14" height="auto" />{' '}<span>+856</span></div></Option>
-              </Select>
-            </Col>
-          </Row>
-        </Modal>
-        <div style={{ margin: '2rem' }}>
-          <CardStyled>
-            <Form
-              form={form}
-              onFinish={onFinish}
-              autoComplete="off"
-              initialValues={data}>
-              <Row gutter={[16, 4]}>
-                <Col span={6}>
-                  <Form.Item
-                    name="title"
-                    label={(<strong>Title</strong>)}
-                  // rules={[{ required: true, message: 'Title is required' }]}
-                  >
-                    <Select placeholder="-- Please Select --">
-                      <Option value='Mr.'>Mr.</Option>
-                      <Option value='Mrs.'>Mrs.</Option>
-                      <Option value='Miss'>Miss</Option>
-                      <Option value='Ms.'>Ms.</Option>
-                    </Select>
-                  </Form.Item>
-                </Col>
-                <Col span={9}>
-                  <Form.Item
-                    name="firstName"
-                    label={(<strong>First Name</strong>)}
-                  // rules={[{ required: true, message: 'First Name required' }]}
-                  >
-                    <Input
-                      type="text"
-                      block="true"
-                      allowClear
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={9}>
-                  <Form.Item
-                    name="lastName"
-                    label={(<strong>Last Name</strong>)}
-                  // rules={[{ required: true, message: 'Last Name is required' }]}
-                  >
-                    <Input
-                      type="text"
-                      block="true"
-                      allowClear
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={[16, 4]}>
-                <Col span={12}>
-                  <Form.Item
-                    label={(<strong>Birthdate</strong>)}
-                    name="birthdate"
-                  // rules={[{ required: true, message: 'Birthdate is required' }]}
-                  >
-                    <DatePicker style={{ width: '100%' }} format={dateFormat} />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="nationality"
-                    label={(<strong>Nationality</strong>)}
-                  // rules={[{ required: true, message: 'Nationality is required' }]}
-                  >
-                    <Select placeholder="-- Please Select --">
-                      <Option value='THAI'>THAI</Option>
-                      <Option value='AMERICAN'>AMERICAN</Option>
-                      <Option value='LAOS'>LAOS</Option>
-                    </Select>
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={[16, 4]}>
-                <Col span={16}>
-                  <Form.Item
-                    name="citizen"
-                    label={(<strong>Citizen ID</strong>)}
-                  // rules={[{ required: true, message: 'Citizen ID is required' }]}
-                  >
-                    <Input
-                      maxLength={13}
-                      type="number"
-                      style={{ width: '100%' }}
-                      allowClear />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={[16, 4]}>
-                <Col>
-                  <Form.Item
-                    name="gender"
-                    label={(<strong>Gender</strong>)}
-                  // rules={[{ required: true, message: 'Gender is required' }]}
-                  >
-                    <Radio.Group style={{ paddingLeft: '1rem' }}>
-                      <Radio style={{ width: 150 }} value="Male">Male</Radio>
-                      <Radio style={{ width: 150 }} value="Female">Female</Radio>
-                      <Radio style={{ width: 150 }} value="Unisex">Unisex</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={[16, 4]}>
-                <Col span={12}>
-                  <Form.Item name="mobilePhone"
-                    label={(<strong>Mobile Phone</strong>)}
-                  // rules={[{ required: true, message: 'Mobile Phone is required' }]}
-                  >
-                    <Input type="number" allowClear />
-                  </Form.Item>
-                </Col>
-                <Col span={5}>
-                  <Form.Item name="prefix"
-                  // rules={[{ required: true, message: 'Country Code is required' }]}
-                  >
-                    <Select placeholder="-- Country Code --">
-                      <Option value="+66"><div><img src={ThaiIcon} alt="thai_icon" width="14" height="auto" />{' '}<span>+66</span></div></Option>
-                      <Option value="+1"><div><img src={UsIcon} alt="us_icon" width="14" height="auto" />{' '}<span>+1</span></div></Option>
-                      <Option value="+856"><div><img src={LaosIcon} alt="laos_icon" width="14" height="auto" />{' '}<span>+856</span></div></Option>
-                    </Select>
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={[16, 4]}>
-                <Col span={12}>
-                  <Form.Item
-                    name="passportNo"
-                    label={(<strong >Passport No</strong>)}
-                  // rules={[{ required: true, message: 'Passport No is required' }]}
-                  >
-                    <Input
-                      allowClear
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={[16, 4]}>
-                <Col span={12}>
-                  <Form.Item
-                    name="expectedSalary"
-                    label={(<strong>Expected Salary</strong>)}
-                  // rules={[{ required: true, message: 'Expected Salary is required' }]}
-                  >
-                    <Input
-                      type="number"
-                      prefix="฿"
-                      suffix="THB" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item>
-                    <Button
-                      style={{ width: '50%', float: "right" }}
-                      type="primary"
-                      htmlType="submit">
-                      Submit
+              defaultValue={prefix}
+              onChange={(e) => { setPrefix(e) }}
+              style={{ width: '100%' }}>
+              <Option value="+66"><div><img src={ThaiIcon} alt="thai_icon" width="14" height="auto" />{' '}<span>+66</span></div></Option>
+              <Option value="+1"><div><img src={UsIcon} alt="us_icon" width="14" height="auto" />{' '}<span>+1</span></div></Option>
+              <Option value="+856"><div><img src={LaosIcon} alt="laos_icon" width="14" height="auto" />{' '}<span>+856</span></div></Option>
+            </Select>
+          </Col>
+        </Row>
+      </Modal>
+      <div style={{ margin: '2rem' }}>
+        <CardStyled>
+          <Form
+            form={form}
+            onFinish={onFinish}
+            autoComplete="off"
+            initialValues={data}>
+            <Row gutter={[16, 4]}>
+              <Col span={6}>
+                <Form.Item
+                  name="title"
+                  label={(<strong>Title</strong>)}
+                  rules={[{ required: true, message: 'Title is required' }]}>
+                  <Select placeholder="-- Please Select --">
+                    <Option value='Mr.'>Mr.</Option>
+                    <Option value='Mrs.'>Mrs.</Option>
+                    <Option value='Miss'>Miss</Option>
+                    <Option value='Ms.'>Ms.</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={9}>
+                <Form.Item
+                  name="firstName"
+                  label={(<strong>First Name</strong>)}
+                  rules={[{ required: true, message: 'First Name required' }]}>
+                  <Input
+                    type="text"
+                    block="true"
+                    allowClear
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={9}>
+                <Form.Item
+                  name="lastName"
+                  label={(<strong>Last Name</strong>)}
+                  rules={[{ required: true, message: 'Last Name is required' }]}>
+                  <Input
+                    type="text"
+                    block="true"
+                    allowClear
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={[16, 4]}>
+              <Col span={12}>
+                <Form.Item
+                  label={(<strong>Birthdate</strong>)}
+                  name="birthdate"
+                  rules={[{ required: true, message: 'Birthdate is required' }]}>
+                  <DatePicker style={{ width: '100%' }} format={dateFormat} />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="nationality"
+                  label={(<strong>Nationality</strong>)}
+                  rules={[{ required: true, message: 'Nationality is required' }]}>
+                  <Select placeholder="-- Please Select --">
+                    <Option value='THAI'>THAI</Option>
+                    <Option value='AMERICAN'>AMERICAN</Option>
+                    <Option value='LAOS'>LAOS</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={[16, 4]}>
+              <Col span={16}>
+                <Form.Item
+                  name="citizen"
+                  label={(<strong>Citizen ID</strong>)}
+                  rules={[{ required: true, message: 'Citizen ID is required' }]}>
+                  <Input
+                    maxLength={13}
+                    type="number"
+                    style={{ width: '100%' }}
+                    allowClear />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={[16, 4]}>
+              <Col>
+                <Form.Item
+                  name="gender"
+                  label={(<strong>Gender</strong>)}
+                  rules={[{ required: true, message: 'Gender is required' }]}>
+                  <Radio.Group style={{ paddingLeft: '1rem' }}>
+                    <Radio style={{ width: 150 }} value="Male">Male</Radio>
+                    <Radio style={{ width: 150 }} value="Female">Female</Radio>
+                    <Radio style={{ width: 150 }} value="Unisex">Unisex</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={[16, 4]}>
+              <Col span={12}>
+                <Form.Item name="mobilePhone"
+                  label={(<strong>Mobile Phone</strong>)}
+                  rules={[{ required: true, message: 'Mobile Phone is required' }]}>
+                  <Input type="number" allowClear />
+                </Form.Item>
+              </Col>
+              <Col span={5}>
+                <Form.Item name="prefix"
+                  rules={[{ required: true, message: 'Country Code is required' }]}>
+                  <Select placeholder="-- Country Code --">
+                    <Option value="+66"><div><img src={ThaiIcon} alt="thai_icon" width="14" height="auto" />{' '}<span>+66</span></div></Option>
+                    <Option value="+1"><div><img src={UsIcon} alt="us_icon" width="14" height="auto" />{' '}<span>+1</span></div></Option>
+                    <Option value="+856"><div><img src={LaosIcon} alt="laos_icon" width="14" height="auto" />{' '}<span>+856</span></div></Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={[16, 4]}>
+              <Col span={12}>
+                <Form.Item
+                  name="passportNo"
+                  label={(<strong >Passport No</strong>)}
+                  rules={[{ required: true, message: 'Passport No is required' }]}>
+                  <Input allowClear />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={[16, 4]}>
+              <Col span={12}>
+                <Form.Item
+                  name="expectedSalary"
+                  label={(<strong>Expected Salary</strong>)}
+                  rules={[{ required: true, message: 'Expected Salary is required' }]}>
+                  <Input
+                    placeholder="I want salary 50,000"
+                    type="number"
+                    prefix="฿"
+                    suffix="THB" />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item>
+                  <Button
+                    style={{ width: '50%', float: "right" }}
+                    type="primary"
+                    htmlType="submit">
+                    Submit
                   </Button>
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Form>
-          </CardStyled>
-          <Divider style={{ marginTop: '2rem' }} />
-          {hasData &&
-            <div style={{
-              left: 0,
-              zIndex: 1,
-              paddingTop: '1rem',
-              paddingLeft: '2rem',
-              position: 'absolute',
-              alignContent: 'center'
-            }}>
-              <Button
-                type="danger"
-                disabled={!hasSelected}
-                onClick={() => { removeRowSelected() }}
-              >
-                Delete
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form>
+        </CardStyled>
+        <Divider style={{ marginTop: '2rem' }} />
+        {hasData &&
+          <div style={{
+            left: 0,
+            zIndex: 1,
+            paddingTop: '1rem',
+            paddingLeft: '2rem',
+            position: 'absolute',
+            alignContent: 'center'
+          }}>
+            <Button
+              type="danger"
+              disabled={!hasSelected}
+              onClick={() => { removeRowSelected() }}>
+              Delete
               </Button>
-            </div>}
-          <Table
-            rowKey="id"
-            columns={columns}
-            scroll={{ x: 1000 }}
-            rowSelection={rowSelection}
-            dataSource={data}
-            pagination={{ position: ['topRight'] }}>
-          </Table>
-          <br />
-        </div>
-      </>
-    );
-  }
+          </div>}
+        <Table
+          rowKey="id"
+          columns={columns}
+          scroll={{ x: 1000 }}
+          rowSelection={rowSelection}
+          dataSource={data}
+          pagination={{ position: ['topRight'] }}>
+        </Table>
+      </div>
+      <br />
+      <footer style={{ textAlign: "center" }}>
+        <h3>Developed by Mr.ADITHEP SUDCHAREE</h3>
+      </footer>
 
-  export default App;
+    </>
+  );
+}
 
-  const CardStyled = styled(Card)`
+export default App;
+
+const CardStyled = styled(Card)`
 &&.ant-card {
   border-radius: .85rem;
 }
